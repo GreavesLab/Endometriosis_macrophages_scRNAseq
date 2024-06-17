@@ -1,1 +1,70 @@
 Figure 1: Endometriosis-associated macrophages exhibit significant transcriptomic heterogeneity.  
+
+# Load libraries and data----
+library(Seurat)
+library(dplyr)
+library(plotly)
+library(ggplot2)
+
+Endo_aggregate <- readRDS("C:/Users/User/Desktop/Greaves/Endo_aggregate.rds")
+
+# Figure 1B----
+cluster_names <- c("Transitory LpMs", "LRM4", "B 1", "LpM2", "LpM1", "B 2", "LRM3", "EM", "AP", "T", "EM /LRM1","LMonos", "Proliferating LpM", "B 3", "SpM", "LRM2", "LRM5", "NKs")
+names(cluster_names) <- levels(Endo_aggregate)
+Endo_aggregate <- RenameIdents(Endo_aggregate, cluster_names)
+DimPlot(Endo_aggregate, reduction = "umap", label = TRUE, pt.size = 0.5) + NoAxes() 
+
+
+#Figure 1B Inset----
+DimPlot(Endo_aggregate,reduction = "umap", label = FALSE, pt.size = 0.5, group.by = "sample") + NoAxes()
+
+
+#Figure 1C----
+my_table <- table(Endo_aggregate$seurat_clusters, Endo_aggregate$orig.ident)
+my_table <- as.data.frame(my_table)
+colnames(my_table) <- c("Cluster", "Category", "Frequency") # Rename the columns 
+my_table$Cluster <- as.numeric(as.character(my_table$Cluster)) # Convert the Cluster column to numeric
+
+    # Sum of each category
+sum_decidanalysis <- sum(my_table$Frequency[1:18])
+sum_endopfanalysis <- sum(my_table$Frequency[19:36])
+sum_lesionanalysis <- sum(my_table$Frequency[37:54])
+sum_shampfanalysis <- sum(my_table$Frequency[55:72])
+
+    # Normalize each value in the "Frequency" column by dividing it by the corresponding sum
+my_table$Frequency[1:18] <- my_table$Frequency[1:18] / sum_decidanalysis
+my_table$Frequency[19:36] <- my_table$Frequency[19:36] / sum_endopfanalysis
+my_table$Frequency[37:54] <- my_table$Frequency[37:54] / sum_lesionanalysis
+my_table$Frequency[55:72] <- my_table$Frequency[55:72] / sum_shampfanalysis
+
+
+normalised_plot <- ggplot(my_table, aes(fill=Category, y=Frequency, x=factor(Cluster, labels = cluster_names))) + 
+  geom_bar(position = "fill", stat="identity") + 
+  labs(x = "Cluster", y = "Percentage") + 
+  theme_void() +
+  theme(plot.title = element_text(size = 14, face = "plain", hjust = 0.5),
+        legend.position = "top", legend.title = element_blank(), legend.text = element_text(size = 10),
+        axis.title = element_text(size = 12),
+        axis.text = element_text(vjust = 0.5, size = 10),
+        axis.text.x = element_text(angle = 0) ) + 
+  scale_fill_discrete(labels=c("Decid", "EndoPF", "Lesion", "ShamPF")) +
+  guides(fill = guide_legend(reverse=TRUE)) +
+  scale_y_continuous(labels = scales::percent)
+
+normalised_plot + coord_flip()
+
+
+#Figure 1D----
+AllMarkers_Aggregate <- FindAllMarkers(Endo_aggregate, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+top5markers_aggregate <- AllMarkers_Aggregate %>%
+  group_by(cluster) %>%
+  slice_max(n = 5, order_by = avg_log2FC)
+DoHeatmap(Endo_aggregate, features = top5markers_aggregate$gene) + NoLegend()
+
+
+#Figure 1E----
+FeaturePlot(Endo_aggregate, features = c("Folr2", "Gas6", "Mrc1", "Cd9", "Mmp12", "Trem2", "Spp1", "Ccr2"), cols = c("grey", "orange", "red")) +   labs(x = "UMAP 1", y = "UMAP 2") +
+  theme(axis.line = element_line(size = 0.7),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_text(size = 12))
