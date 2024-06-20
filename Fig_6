@@ -1,1 +1,186 @@
 Figure 6: Cross-species mapping of mouse and human peritoneal macrophages. 
+
+# Load libraries and data----
+
+library(Seurat)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(ggvenn)
+library(wesanderson)
+
+PF1_H <- readRDS("C:/Users/User/Desktop/Greaves/PF1_H.rds")
+                
+PF1_M <- readRDS("C:/Users/User/Desktop/Greaves/PF1_M.rds")
+
+merged_pf_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_pf_obj.rds")
+
+# Fig 6A
+PF1_M <- SetIdent(PF1_M, value = PF1_M@meta.data$seurat_clusters)
+
+PF1_M <- RenameIdents(PF1_M,   
+                      c('0' = 'B1',
+                        '1' = 'LpM1',
+                        '2' = 'Transit LpM',
+                        '3' = 'B2',
+                        '4' = 'LpM3',
+                        '5' = 'LpM2',
+                        '6' = 'SpM',
+                        '7' = 'T1',
+                        '8' = 'Prolif LpM',
+                        '9' = 'NK1',
+                        '10' = 'DC1'
+                      ))
+
+
+DimPlot(PF1_M, reduction = "umap", label = TRUE, label.size = 5, repel = TRUE) + NoLegend()
+
+# Fig 6B
+
+PF1_H <- SetIdent(PF1_H, value = PF1_H@meta.data$seurat_clusters)
+
+PF1_H <- RenameIdents(PF1_H,   
+                      c('0' = 'pM1',
+                        '1' = 'DC1',
+                        '2' = 'pM2',
+                        '3' = 'T1',
+                        '4' = 'pM3',
+                        '5' = 'pMono',
+                        '6' = 'T2',
+                        '7' = 'NK1',
+                        '8' = 'NK2',
+                        '9' = 'pM4',
+                        '10' = 'Prolif-pM',
+                        '11' = 'DC2',
+                        '13' = 'Plasma',
+                        '14' = 'Progenitor',
+                        '15' = 'Mast'
+                      ))
+
+
+
+DimPlot(PF1_H, reduction = "umap", label = TRUE, label.size = 5, repel = TRUE) + NoLegend()
+
+
+# Fig 6C
+
+breakdown <- table(PF1_H@active.ident)
+Cluster <- names(breakdown)
+breakdown <- round(as.vector(breakdown) / sum(breakdown) * 100, 1)
+
+human_pf_df <- data.frame(Cluster = Cluster, Proportion = breakdown, Type = 'Human') %>% 
+  dplyr::mutate(Grouped = case_when(Cluster %in% c('pM1','pM2','pM3','pM4', 'pMono', 'Prolif') ~ 'Macrophages',
+                                    Cluster %in% c('DC1','DC2') ~ 'DCs',
+                                    Cluster %in% c('NK1','NK2') ~ 'NKs',
+                                    Cluster %in% c('T1', 'T2') ~ 'T cells',
+                                    !Cluster %in% c('pM1','pM2','pM3','pM4', 'pMono', 'Prolif','DC1','DC2','NK1','NK2', 'T1', 'T2') ~ 'Other')) %>%
+  group_by(Grouped) %>% dplyr::mutate(Grouped_Prop = sum(Proportion)) %>% dplyr::mutate(Grouped = factor(Grouped, levels = c('Macrophages','DCs','T cells', 'NKs','Other')))
+
+breakdown <- table(PF1_M@active.ident)
+Cluster <- names(breakdown)
+breakdown <- round(as.vector(breakdown) / sum(breakdown) * 100, 1)
+
+mouse_pf_df <- data.frame(Cluster = Cluster, Proportion = breakdown, Type = 'Mouse') %>% 
+  dplyr::mutate(Grouped = case_when(Cluster %in% c('LpM1','Transit LpM', 'LpM2','LpM3','SpM') ~ 'Macrophages',
+                                    Cluster %in% c('DC1') ~ 'DCs',
+                                    Cluster %in% c('NK1') ~ 'NKs',
+                                    Cluster %in% c('T1') ~ 'T cells',
+                                    !Cluster %in% c('LpM1','Transit LpM', 'LpM2','LpM3','SpM','DC1','NK1','T1') ~ 'Other')) %>%
+  group_by(Grouped) %>% dplyr::mutate(Grouped_Prop = sum(Proportion)) %>% dplyr::mutate(Grouped = factor(Grouped, levels = c('Macrophages','DCs','T cells', 'NKs','Other')))
+
+lll <- rbind(mouse_pf_df, human_pf_df)
+
+ggplot(lll, aes(fill=Grouped, y=Proportion, x=Type)) + xlab('Species') +
+  geom_bar(position="fill", stat="identity")  + theme(legend.position = "right", legend.title = element_blank(), text = element_text(size=12), axis.text = element_text(size=12),
+                                                      axis.text.x = element_text(angle = 0, 
+                                                                                 vjust = 0.5, 
+   
+# Fig 6D                                                                                 
+                                                                                                                                                               hjust = 0.5))
+PF1_A <- PF1_H
+DimPlot(PF1_A, reduction = "umap", label = TRUE)
+PF1_A <- SetIdent(PF1_A, value = PF1_A@meta.data$seurat_clusters)
+PF1_A <- RenameIdents(PF1_A,   
+                      c('0' = 'Macrophage',
+                        '1' = 'DC1',
+                        '2' = 'Macrophage',
+                        '3' = 'T1',
+                        '4' = 'Macrophage',
+                        '5' = 'Macrophage',
+                        '6' = 'T2',
+                        '7' = 'NK1',
+                        '8' = 'NK2',
+                        '9' = 'Macrophage',
+                        '10' = 'Prolif',
+                        '11' = 'DC2',
+                        '13' = 'Plasma',
+                        '14' = 'Progenitor',
+                        '15' = 'Mast'
+                      ))
+
+
+p77 <- DimPlot(PF1_A, reduction = "umap", label = TRUE) + NoLegend()
+Prolif_macs_ids <- CellSelector(p77)
+Idents(PF1_A, cells = Prolif_macs_ids, drop = FALSE, replace = FALSE) <- "Macrophage"
+
+PF1_A_Macrophage <- WhichCells(PF1_A, idents = "Macrophage")
+DimPlot(PF1_A, reduction = "umap", label = FALSE, cells.highlight = PF1_A_Macrophage, cols.highlight = "#E6A0C4") + NoLegend()
+
+PF1_B <- PF1_M
+DimPlot(PF1_B, reduction = "umap", label = TRUE)
+PF1_B <- SetIdent(PF1_B, value = PF1_B@meta.data$seurat_clusters)
+PF1_B <- RenameIdents(PF1_B,   
+                      c('0' = 'B1',
+                        '1' = 'Macrophage',
+                        '2' = 'Macrophage',
+                        '3' = 'B2',
+                        '4' = 'Macrophage',
+                        '5' = 'Macrophage',
+                        '6' = 'Macrophage',
+                        '7' = 'T1',
+                        '8' = 'Macrophage',
+                        '9' = 'NK1',
+                        '10' = 'DC1'
+                      ))
+
+PF1_B_Macrophage <- WhichCells(PF1_B, idents = "Macrophage")
+DimPlot(PF1_B, reduction = "umap", label = FALSE, cells.highlight = PF1_B_Macrophage, cols.highlight = "#C6CDF7") + NoLegend()
+
+x <- list("Mouse" = set1, "Human" = set2)
+ggvenn(x)
+ggvenn(x, fill_color = c("#C6CDF7","#E6A0C4"), show_percentage = FALSE, set_name_size = 3) 
+
+
+# Fig 6E
+
+merged_pf_obj <- SetIdent(merged_pf_obj, value = merged_pf_obj@meta.data$seurat_clusters)
+
+merged_pf_obj <- RenameIdents(merged_pf_obj,   
+                              c('0' = 'Prototypical pM', 
+                                '1' = 'Transit pM',
+                                '2' = 'Vcan+ pM',
+                                '3' = '(S) pM',
+                                '4' = 'Lyve1+ pM',
+                                '5' = 'Prolif pM'
+                              ))
+
+DimPlot(merged_pf_obj, reduction = "umap.cca", label = T, label.size = 5, repel = TRUE) + NoLegend()
+
+# Fig 6F
+
+
+breakdown <- table(merged_pf_obj@active.ident, merged_pf_obj@meta.data$Species)
+sums_norm <- apply(breakdown,2,sum)
+scaled_breakdown <- sweep(breakdown,2,sums_norm,'/')
+sums <- apply(scaled_breakdown,1,sum) 
+percent_breakdown <- sweep(scaled_breakdown,1,sums,'/') * 100
+
+gg_df <- as.data.frame(percent_breakdown)
+colnames(gg_df) <- c('Cluster','Sample','Proportion') 
+p2 <- ggplot(gg_df, aes(fill=Sample, y=Proportion, x=Cluster)) + coord_flip()  + 
+  geom_bar(position="fill", stat="identity") + 
+  theme(legend.position = "right", legend.title = element_blank(), text = element_text(size=15), axis.text = element_text(size=15),
+        axis.text.x = element_text(angle = 45, 
+                                   vjust = 1, 
+                                   hjust = 1)) +
+  scale_fill_manual(values = wes_palette("GrandBudapest2", n = 2))
