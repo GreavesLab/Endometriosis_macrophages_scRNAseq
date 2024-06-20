@@ -12,72 +12,84 @@ library(dplyr)
 library(ggvenn)
 library(wesanderson)
 
-M1 <- readRDS("C:/Users/User/Desktop/Greaves/M1.rds")
+PF1_H <- readRDS("C:/Users/User/Desktop/Greaves/PF1_H.rds")
+                
+PF1_M <- readRDS("C:/Users/User/Desktop/Greaves/PF1_M.rds")
 
-human.combined.cd45 <- readRDS("C:/Users/User/Desktop/Greaves/human.combined.cd45.rds")
+merged_pf_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_pf_obj.rds")
 
-merged_lesion_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_lesion_obj.rds")
+# Fig S7A
 
-# Fig S9A
+DimPlot(merged_pf_obj, reduction = "umap.cca", split.by = "Species", label = TRUE, repel = TRUE)
 
-DimPlot(merged_lesion_obj, reduction = "umap.cca", split.by = "Species", label = TRUE, repel = TRUE)
+# Fig S7B
 
-# Fig S9B
+Human_pf_pMϕ2 <- WhichCells(PF1_H, idents = "pMϕ2")
 
-Human_lesion_LMϕ1 <- WhichCells(human.combined.cd45, idents = "LMϕ1")
-
-p1 <- DimPlot(human.combined.cd45, reduction = "umap", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
-p2 <- DimPlot(human.combined.cd45, reduction = "umap", label = FALSE, label.size = 3, cells.highlight = Human_lesion_LMϕ1, cols.highlight = "#E6A0C4") + NoLegend()
+p1 <- DimPlot(PF1_H, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(PF1_H, reduction = "umap", label = FALSE, cells.highlight = Human_pf_pMϕ2, cols.highlight = "#E6A0C4") + NoLegend()
 p1 | p2
 
+Human_pf_pMϕ2 <- paste0(Human_pf_pMϕ2, "_2", sep='')
+Human_pf_pMϕ2 
 
-p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 3, repel = TRUE) + NoLegend()
-p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", cells.highlight = Human_lesion_LMϕ1, cols.highlight = "#E6A0C4", label = FALSE, repel = TRUE) + NoLegend()
+p3 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_pf_obj, reduction = "umap.cca", cells.highlight = list(Human_pf_pMϕ2), cols.highlight = "#E6A0C4", label = FALSE, repel = TRUE) + NoLegend()
 p3 | p4
 
 p2 | p4
 
-# Fig S9C
+# Fig S7C
 
-Mouse_lesion_LRM <- WhichCells(M1, idents = "LRM4")
+Mouse_pf_LpM1 <- WhichCells(PF1_M, idents = "LpM1")
 
-p1 <- DimPlot(M1, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
-p2 <- DimPlot(M1, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Mouse_lesion_LRM4, cols.highlight = "#C6CDF7") + NoLegend()
+p1 <- DimPlot(PF1_M, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(PF1_M, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Mouse_pf_LpM1, cols.highlight = "#C6CDF7") + NoLegend()
 p1 | p2
 
-p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
-p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Mouse_lesion_LRM4), cols.highlight = "#C6CDF7") + NoLegend()
+Mouse_pf_LpM1 <- paste0(Mouse_pf_LpM1, "_1", sep='')
+Mouse_pf_LpM1
+
+p3 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Mouse_pf_LpM1), cols.highlight = "#C6CDF7") + NoLegend()
 p3 | p4
 
 p2 | p4
 
-# Fig S9D
-Human_lesion_LMϕ3 <- WhichCells(human.combined.cd45, idents = "LMϕ3")
+# Fig S7D
 
-p1 <- DimPlot(human.combined.cd45, reduction = "umap", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
-p2 <- DimPlot(human.combined.cd45, reduction = "umap", label = FALSE, label.size = 3, cells.highlight = Human_lesion_LMϕ3, cols.highlight = "#E6A0C4") + NoLegend()
+Human_pf_Prolif <- WhichCells(PF1_H, idents = "Prolif")
+
+p1 <- DimPlot(PF1_H, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(PF1_H, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Human_pf_Prolif, cols.highlight = "#E6A0C4") + NoLegend()
 p1 | p2
 
+Human_pf_Prolif <- paste0(Human_pf_Prolif, "_2", sep='')
+Human_pf_Prolif
 
-p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 3, repel = TRUE) + NoLegend()
-p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", cells.highlight = Human_lesion_LMϕ3, cols.highlight = "#E6A0C4", label = FALSE, repel = TRUE) + NoLegend()
+p3 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Human_pf_Prolif), cols.highlight = "#E6A0C4") + NoLegend()
 p3 | p4
 
 p2 | p4
 
-# Fig S9E
-Mouse_lesion_mono <- WhichCells(M1, idents = "LMono")
+# Fig S7E
 
-p1 <- DimPlot(M1, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
-p2 <- DimPlot(M1, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Mouse_lesion_mono, cols.highlight = "#C6CDF7") + NoLegend()
+Mouse_pf_SpM <- WhichCells(PF1_M, idents = "SpM")
+
+p1 <- DimPlot(PF1_M, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(PF1_M, reduction = "umap", label = FALSE, cells.highlight = Mouse_pf_SpM, cols.highlight = "#C6CDF7") + NoLegend()
 p1 | p2
 
+Mouse_pf_SpM <- paste0(Mouse_pf_SpM, "_1", sep='')
+Mouse_pf_SpM
 
-p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
-p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Mouse_lesion_mono), cols.highlight = "#C6CDF7") + NoLegend()
+p3 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 4, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_pf_obj, reduction = "umap.cca", cells.highlight = list(Mouse_pf_SpM), cols.highlight = "#C6CDF7", label = FALSE, repel = TRUE) + NoLegend()
 p3 | p4
 
 p2 | p4
+
 
 
 
