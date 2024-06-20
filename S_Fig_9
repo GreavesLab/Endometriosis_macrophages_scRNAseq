@@ -1,1 +1,63 @@
-Figure S9: Validation of integrative clustering
+Figure S9: Validation of integrative clustering (lesions)
+
+# Fig S9B
+
+Human_lesion_LMϕ1 <- WhichCells(human.combined.cd45, idents = "LMϕ1")
+
+p1 <- DimPlot(human.combined.cd45, reduction = "umap", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
+p2 <- DimPlot(human.combined.cd45, reduction = "umap", label = FALSE, label.size = 3, cells.highlight = Human_lesion_LMϕ1, cols.highlight = "#E6A0C4") + NoLegend()
+p1 | p2
+
+
+p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 3, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", cells.highlight = Human_lesion_LMϕ1, cols.highlight = "#E6A0C4", label = FALSE, repel = TRUE) + NoLegend()
+p3 | p4
+
+p2 | p4
+
+# Fig S9C
+
+Mouse_lesion_LRM <- WhichCells(M1, idents = "LRM4")
+
+p1 <- DimPlot(M1, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(M1, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Mouse_lesion_LRM4, cols.highlight = "#C6CDF7") + NoLegend()
+p1 | p2
+
+p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Mouse_lesion_LRM4), cols.highlight = "#C6CDF7") + NoLegend()
+p3 | p4
+
+p2 | p4
+
+# Fig S9D
+Human_lesion_LMϕ3 <- WhichCells(human.combined.cd45, idents = "LMϕ3")
+
+p1 <- DimPlot(human.combined.cd45, reduction = "umap", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
+p2 <- DimPlot(human.combined.cd45, reduction = "umap", label = FALSE, label.size = 3, cells.highlight = Human_lesion_LMϕ3, cols.highlight = "#E6A0C4") + NoLegend()
+p1 | p2
+
+
+p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 3, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", cells.highlight = Human_lesion_LMϕ3, cols.highlight = "#E6A0C4", label = FALSE, repel = TRUE) + NoLegend()
+p3 | p4
+
+p2 | p4
+
+# Fig S9E
+Mouse_lesion_mono <- WhichCells(M1, idents = "LMono")
+
+p1 <- DimPlot(M1, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
+p2 <- DimPlot(M1, reduction = "umap", label = FALSE, repel = TRUE, cells.highlight = Mouse_lesion_mono, cols.highlight = "#C6CDF7") + NoLegend()
+p1 | p2
+
+
+p3 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, pt.size = 0.8, label.size = 5, repel = TRUE) + NoLegend()
+p4 <- DimPlot(merged_lesion_obj, reduction = "umap.cca", label = FALSE, repel = TRUE, cells.highlight = list(Mouse_lesion_mono), cols.highlight = "#C6CDF7") + NoLegend()
+p3 | p4
+
+p2 | p4
+
+
+
+
+
