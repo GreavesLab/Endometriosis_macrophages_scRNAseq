@@ -1,5 +1,24 @@
 Figure S9: Validation of integrative clustering (lesions)
 
+# Load libraries and data----
+
+library(Seurat)
+library(ggplot2)
+library(plyr)
+library(dplyr)
+library(ggvenn)
+library(wesanderson)
+
+M1 <- readRDS("C:/Users/User/Desktop/Greaves/M1.rds")
+
+human.combined.cd45 <- readRDS("C:/Users/User/Desktop/Greaves/human.combined.cd45.rds")
+
+merged_lesion_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_lesion_obj.rds")
+
+# Fig S9A
+
+DimPlot(merged_lesion_obj, reduction = "umap.cca", split.by = "Species", label = TRUE, repel = TRUE)
+
 # Fig S9B
 
 Human_lesion_LMϕ1 <- WhichCells(human.combined.cd45, idents = "LMϕ1")
