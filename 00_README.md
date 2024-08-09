@@ -2,7 +2,7 @@
 
 This repository accompanies the manuscript
 
-Henlon Y, Panir K, McIntyre I, Hogg C, Dhami P, Cuff A, Senior A, Moolchandani-Adwani N, Courtois E, Horne A, Rosser M, Ott S, Greaves E. "Defining the tissue-specific heterogeneity and function of endometriosis-associated macrophage subpopulations by single cell analysis" (2024) currently available from PNAS (insert link).
+Henlon Y, Panir K, McIntyre I, Hogg C, Dhami P, Cuff A, Senior A, Moolchandani-Adwani N, Courtois E, Horne A, Rosser M, Ott S, Greaves E. "Single-cell analysis identifies distinct macrophage phenotypes associated with pro-disease and pro-resolving functions in the endometriotic niche" (2024) currently available from PNAS (insert link).
 
 Raw data generated for this study available at GEO at XXXXX (to be released upon publication).
 
