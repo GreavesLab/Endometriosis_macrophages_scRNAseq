@@ -1,4 +1,3 @@
-# Endometriosis_macrophages_scRNAseq
 # Single-cell analysis identifies distinct macrophage phenotypes associated with pro-disease and pro-resolving functions in the endometriotic niche
 
 This repository accompanies the manuscript
