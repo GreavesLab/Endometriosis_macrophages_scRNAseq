@@ -1,4 +1,4 @@
-Figure S7: Validation of integrative clustering. 
+Figure S8: Validation of integrative clustering. 
 PM (OVX)
 
 # Load libraries and data----
@@ -16,11 +16,11 @@ PF1_M <- readRDS("C:/Users/User/Desktop/Greaves/PF1_M.rds")
 
 merged_pf_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_pf_obj.rds")
 
-# Fig S7A
+# Fig S8A
 
 DimPlot(merged_pf_obj, reduction = "umap.cca", split.by = "Species", label = TRUE, repel = TRUE)
 
-# Fig S7B
+# Fig S8B
 
 Human_pf_pMϕ2 <- WhichCells(PF1_H, idents = "pMϕ2")
 
@@ -37,7 +37,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S7C
+# Fig S8C
 
 Mouse_pf_LpM1 <- WhichCells(PF1_M, idents = "LpM1")
 
@@ -54,7 +54,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S7D
+# Fig S8D
 
 Human_pf_Prolif <- WhichCells(PF1_H, idents = "Prolif")
 
@@ -71,7 +71,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S7E
+# Fig S8E
 
 Mouse_pf_SpM <- WhichCells(PF1_M, idents = "SpM")
 
