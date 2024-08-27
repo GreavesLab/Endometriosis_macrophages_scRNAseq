@@ -1,4 +1,4 @@
-Figure 6: Cross-species mapping of mouse and human peritoneal macrophages. 
+Figure 5: Cross-species mapping of mouse and human peritoneal macrophages. 
 
 # Load libraries and data----
 
@@ -15,7 +15,7 @@ PF1_M <- readRDS("C:/Users/User/Desktop/Greaves/PF1_M.rds")
 
 merged_pf_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_pf_obj.rds")
 
-# Fig 6A
+# Fig 5A
 PF1_M <- SetIdent(PF1_M, value = PF1_M@meta.data$seurat_clusters)
 
 PF1_M <- RenameIdents(PF1_M,   
@@ -35,7 +35,7 @@ PF1_M <- RenameIdents(PF1_M,
 
 DimPlot(PF1_M, reduction = "umap", label = TRUE, label.size = 5, repel = TRUE) + NoLegend()
 
-# Fig 6B
+# Fig 5B
 
 PF1_H <- SetIdent(PF1_H, value = PF1_H@meta.data$seurat_clusters)
 
@@ -62,7 +62,7 @@ PF1_H <- RenameIdents(PF1_H,
 DimPlot(PF1_H, reduction = "umap", label = TRUE, label.size = 5, repel = TRUE) + NoLegend()
 
 
-# Fig 6C
+# Fig 5C
 
 breakdown <- table(PF1_H@active.ident)
 Cluster <- names(breakdown)
@@ -95,7 +95,7 @@ ggplot(lll, aes(fill=Grouped, y=Proportion, x=Type)) + xlab('Species') +
                                                       axis.text.x = element_text(angle = 0, 
                                                                                  vjust = 0.5, 
    
-# Fig 6D                                                                                 
+# Fig 5D                                                                                 
                                                                                                                                                                hjust = 0.5))
 PF1_A <- PF1_H
 DimPlot(PF1_A, reduction = "umap", label = TRUE)
@@ -151,7 +151,7 @@ ggvenn(x)
 ggvenn(x, fill_color = c("#C6CDF7","#E6A0C4"), show_percentage = FALSE, set_name_size = 3) 
 
 
-# Fig 6E
+# Fig 5E
 
 merged_pf_obj <- SetIdent(merged_pf_obj, value = merged_pf_obj@meta.data$seurat_clusters)
 
@@ -166,7 +166,7 @@ merged_pf_obj <- RenameIdents(merged_pf_obj,
 
 DimPlot(merged_pf_obj, reduction = "umap.cca", label = T, label.size = 5, repel = TRUE) + NoLegend()
 
-# Fig 6F
+# Fig 5F
 
 
 breakdown <- table(merged_pf_obj@active.ident, merged_pf_obj@meta.data$Species)
