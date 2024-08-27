@@ -1,4 +1,4 @@
-Figure 7: Cross-species mapping of mouse and human lesions-resident macrophages. 
+Figure 6: Cross-species mapping of mouse and human lesions-resident macrophages. 
 
 # Load libraries and data----
 
@@ -15,7 +15,7 @@ human.combined.cd45 <- readRDS("C:/Users/User/Desktop/Greaves/human.combined.cd4
 
 merged_lesion_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_lesion_obj.rds")
 
-# Fig 7A
+# Fig 6A
 M1 <- SetIdent(M1, value = M1@meta.data$seurat_clusters)
 
 M1 <- RenameIdents(M1,   
@@ -36,7 +36,7 @@ M1 <- RenameIdents(M1,
 
 DimPlot(M1, reduction = "umap", label = FALSE, label.size = 5, repel = TRUE) + NoLegend()
 
-# Fig 7B
+# Fig 6B
 
 human.combined.cd45 <- SetIdent(human.combined.cd45, value = human.combined.cd45@meta.data$seurat_clusters)
 
@@ -66,7 +66,7 @@ human.combined.cd45 <- RenameIdents(human.combined.cd45,
 DimPlot(human.combined.cd45, reduction = "umap", label = FALSE, label.size = 5, repel = TRUE) + NoLegend()
 
 
-# Fig 7C
+# Fig 6C
 
 breakdown <- table(human.combined.cd45@active.ident)
 Cluster <- names(breakdown)
@@ -103,7 +103,7 @@ ggplot(lll, aes(fill=Grouped, y=Proportion, x=Type)) + xlab('Species') +
                                                                                  vjust = 0.5, 
                                                                                  hjust = 0.5))
                                                                                  
-# Fig 7D                                                                                 
+# Fig 6D                                                                                 
                                                                              
 human_A <- human.combined.cd45
 DimPlot(human_A, reduction = "umap", label = TRUE)
@@ -166,7 +166,7 @@ ggvenn(x)
 ggvenn(x, fill_color = c("#C6CDF7","#E6A0C4"), show_percentage = FALSE, set_name_size = 3) 
 
 
-# Fig 7E
+# Fig 6E
 
 merged_lesion_obj <- SetIdent(merged_lesion_obj, value = merged_lesion_obj@meta.data$seurat_clusters)
 
@@ -186,7 +186,7 @@ merged_lesion_obj <- RenameIdents(merged_lesion_obj,
 DimPlot(merged_lesion_obj, reduction = "umap.cca", label = TRUE, label.size = 5, repel = TRUE) + NoLegend()
 
 
-# Fig 7F
+# Fig 6F
 
 
 breakdown <- table(merged_lesion_obj@active.ident, merged_lesion_obj@meta.data$Species)
