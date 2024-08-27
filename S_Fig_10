@@ -15,11 +15,11 @@ human.combined.cd45 <- readRDS("C:/Users/User/Desktop/Greaves/human.combined.cd4
 
 merged_lesion_obj <- readRDS("C:/Users/User/Desktop/Greaves/merged_lesion_obj.rds")
 
-# Fig S9A
+# Fig S10A
 
 DimPlot(merged_lesion_obj, reduction = "umap.cca", split.by = "Species", label = TRUE, repel = TRUE)
 
-# Fig S9B
+# Fig S10B
 
 Human_lesion_LMϕ1 <- WhichCells(human.combined.cd45, idents = "LMϕ1")
 
@@ -34,7 +34,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S9C
+# Fig S10C
 
 Mouse_lesion_LRM <- WhichCells(M1, idents = "LRM4")
 
@@ -48,7 +48,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S9D
+# Fig S10D
 Human_lesion_LMϕ3 <- WhichCells(human.combined.cd45, idents = "LMϕ3")
 
 p1 <- DimPlot(human.combined.cd45, reduction = "umap", label = TRUE, label.size = 3, repel = TRUE) + NoLegend()
@@ -62,7 +62,7 @@ p3 | p4
 
 p2 | p4
 
-# Fig S9E
+# Fig S10E
 Mouse_lesion_mono <- WhichCells(M1, idents = "LMono")
 
 p1 <- DimPlot(M1, reduction = "umap", label = TRUE, label.size = 4, repel = TRUE) + NoLegend()
