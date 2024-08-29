@@ -1,1 +1,24 @@
 Figure S5: Canonical markers used for assigning cell identity
+
+# Load Libraries ----
+library(Seurat)
+library(dplyr)
+library(Matrix)
+library(ggplot2)
+library(cowplot)
+
+# Load Seuart object ----
+Intact <- readRDS("/Intact&NaivePF.rds")
+
+# Supplementary Figure S5 ----
+genes_used <- c("Adgre1", "H2-Aa", "Retnla", "Cd19", "Cd3e", "Cd209a", "Cx3cr1", "Top2a", "S100a6")
+
+FS5 <- VlnPlot(Intact, genes_used, stack = TRUE, sort = FALSE, flip = TRUE, same.y.lims = TRUE) +
+  theme(legend.position = "none",
+        axis.title.x = element_blank(),
+        axis.title.y.left = element_text(size = 20),
+        axis.text.y = element_text(size = 20),
+        axis.title.y.right = element_text(size = 40),
+        axis.text.x = element_text(size = 20))
+
+FS5
