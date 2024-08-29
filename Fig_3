@@ -1,1 +1,112 @@
 Figure 3: A unique population of monocyte-derived LpMs is evident in mice with experimental endometriosis. 
+# Load Libraries ----
+library(Seurat)
+library(dplyr)
+library(Matrix)
+library(ggplot2)
+library(cowplot)
+
+# Load Seuart object ----
+Intact <- readRDS("/Intact&NaivePF.rds")
+
+# Figure 3A ----
+# Endo-Intact and Naive PF UMAP
+
+# Intact UMAP coloured by cluster
+arr <- list(x = -13.6, y = -17, x_len = 6.5, y_len = 6.5) # placement of UMAP axis arrows
+
+F4A.1 <- DimPlot(Intact, reduction = "umap", label = TRUE, group.by = "celltype") +
+  NoLegend() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(plot.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 12, hjust = 0.1, size = 10),
+        axis.title.y = element_text(vjust = -11.5, hjust = 0.08, size = 10)) +
+  annotate("segment", 
+           x = arr$x, xend = arr$x + c(arr$x_len, 0), 
+           y = arr$y, yend = arr$y + c(0, arr$y_len), 
+           arrow = arrow(type = "closed", length = unit(10, 'pt')))
+F3A.1
+
+# Intact UMAP coloured by species (inset)
+arr <- list(x = -13.6, y = -17, x_len = 6.5, y_len = 6.5) # placement of UMAP axis arrows
+
+F3A.2 <- DimPlot(Intact, reduction = "umap", label = FALSE, group.by = "orig.ident") +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(plot.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 12, hjust = 0.1, size = 10),
+        axis.title.y = element_text(vjust = -11.5, hjust = 0.08, size = 10)) +
+  annotate("segment", 
+           x = arr$x, xend = arr$x + c(arr$x_len, 0), 
+           y = arr$y, yend = arr$y + c(0, arr$y_len), 
+           arrow = arrow(type = "closed", length = unit(10, 'pt')))
+
+F3A.2
+
+# Figure 3B ----
+# Barchart of cluster membership from different samples
+
+breakdown <- table(Intact@meta.data$celltype2, Intact@meta.data$orig.ident)
+breakdown
+
+## Normalise
+sums_norm <- apply(breakdown,2,sum)
+scaled_breakdown <- sweep(breakdown,2,sums_norm,'/')
+sums <- apply(scaled_breakdown,1,sum)
+percent_breakdown <- sweep(scaled_breakdown,1,sums,'/') * 100
+percent_breakdown
+
+gg_df <- as.data.frame(percent_breakdown)
+colnames(gg_df) <- c('Cluster','Sample','Proportion')
+
+ggplot(gg_df, aes(fill=Sample, y=Proportion, x=Cluster)) +
+  geom_bar(position="fill", stat="identity") + coord_flip()
+
+F3B <- ggplot(gg_df, aes(x=Cluster, y=Proportion, fill=Sample)) + 
+  geom_bar(position = "fill", stat="identity") +
+  #scale_x_discrete(limits = cluster) +
+  coord_flip() +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 14, face = "plain", hjust = 0.5),
+        legend.position = "top", legend.title = element_blank(), legend.text = element_text(size = 10),
+        axis.title = element_blank(),
+        axis.text = element_text(vjust = 0.5, size = 10)) + 
+  scale_fill_discrete(labels=c("Endo-Intact PF", "Naive PF")) +
+  guides(fill = guide_legend(reverse=TRUE)) +
+  scale_y_continuous(labels = scales::percent)
+
+F3B
+
+
+
+# Figure 3C ----
+# Heatmap displaying top 5 genes per cluster
+
+Intact_markers <- FindAllMarkers(object = Intact, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+
+Intact_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC) -> top5
+p4C <- DoHeatmap(object = Intact, features = top5$gene, size = 5, angle = 0, hjust = 0.5, group.by = "celltype2") +
+  theme(axis.text.y = element_text(size = 8)) + NoLegend()
+
+F3C
+
+
+# Figure 3D ----
+# Feature Plots
+
+genes_used <- c("Ccr2, Timd4", "Adgre1")
+
+F3D <- FeaturePlot(Intact, features = genes_used, cols = c("grey", "orange", "red"), label = TRUE, label.size = 3, repel = T) + 
+  labs(x = "UMAP 1", y = "UMAP 2") &
+  theme(plot.title = element_text(face = "italic"),
+        axis.line = element_line(size = 0.7),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank()) + NoLegend()
+
+F3D
