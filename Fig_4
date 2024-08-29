@@ -15,7 +15,7 @@ Intact <- readRDS("/Intact&NaivePF.rds")
 
 genes_used <- c("Pid1, Saa3", "Apoe", "Lrp1")
 
-F4A <- FeaturePlot(Intact, features = genes_used, cols = c("grey", "orange", "red"), label = TRUE, label.size = 3, repel = T) + 
+F4A <- FeaturePlot(Intact, features = genes_used, cols = c("grey", "orange", "red"), label = TRUE, label.size = 3, repel = T) & 
   labs(x = "UMAP 1", y = "UMAP 2") &
   theme(plot.title = element_text(face = "italic"),
         axis.line = element_line(size = 0.7),
