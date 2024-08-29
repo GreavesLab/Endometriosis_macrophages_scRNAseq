@@ -1,1 +1,277 @@
 Figure S9: Cross-species mapping of mouse (intact model) and human peritoneal macrophages.
+
+# Packages
+library(Seurat)
+library(ggplot2)
+library(patchwork)
+library(dplyr)
+library(cowplot)
+library(MAST)
+library(wesanderson)
+library(ggvenn)
+
+# Figure A ----
+# Endo-Intact UMAP
+
+Endo_Intact <- readRDS("/Endo_Intact/Endo_Intact.rds")
+
+DimPlot(Endo_Intact, label = TRUE, group.by = "cell.subtype")
+
+# Rename clusters
+
+Idents(Endo_Intact) <- "cell.subtype"
+DimPlot(Endo_Intact, label = TRUE)
+cell.subtype.ids <- c('LpM3' = 'LpM3', 
+                      'Monocyte-derived LpM2' = 'Mono-derived \n LpM2',
+                      'B2' = 'B2',
+                      'B1' = 'B1',
+                      'Monocyte-derived LpM1' = 'Mono-derived \n LpM1',
+                      'T' = 'T',
+                      'NK' = 'NK',
+                      'Undetermined' = 'IC',
+                      'SpM' = 'SpM',
+                      'DC' = 'DC',
+                      'Prolif LpM' = 'Prolif LpM'
+                      )
+
+names(cell.subtype.ids) <- levels(Endo_Intact)
+Endo_Intact <- RenameIdents(Endo_Intact, cell.subtype.ids)
+Endo_Intact$cell.subtype.2 <- Idents(Endo_Intact)
+
+DimPlot(Endo_Intact, label = TRUE, label.size = 5, pt.size = 0.5, repel = FALSE, group.by = "cell.subtype.2") + NoLegend()
+
+arr1 <- list(x = -13, y = -13, x_len = 4, y_len = 4)
+p1 <- DimPlot(Endo_Intact, reduction = "umap", label = TRUE, label.size = 6, repel = FALSE) +
+  NoLegend() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 10, hjust = 0.07, size = 10),
+        axis.title.y = element_text(vjust = -11, hjust = 0.07, size = 10)) +
+  annotate("segment", 
+           x = arr1$x, xend = arr1$x + c(arr1$x_len, 0), 
+           y = arr1$y, yend = arr1$y + c(0, arr1$y_len), 
+           arrow = arrow(type = "closed", length = unit(6, 'pt')))
+p1
+
+
+# Figure B ----
+# Human UMAP
+
+load("/PF1_H2024-01-23.RData")
+Human <- PF1_H
+rm(PF1_H)
+
+DimPlot(Human, label = TRUE)
+
+# Rename clusters
+
+Idents(Human) <- "seurat_clusters"
+DimPlot(Human, label = TRUE)
+cell.subtype.ids <- c('0' = 'pM1', 
+                      '1' = 'DC1',
+                      '2' = 'pM2',
+                      '3' = 'T1',
+                      '4' = 'pM3',
+                      '5' = 'pMono',
+                      '6' = 'T2',
+                      '7' = 'NK1',
+                      '8' = 'NK2',
+                      '9' = 'pM4',
+                      '10' = 'Prolif-pM',
+                      '11' = 'DC2',
+                      '13' = 'Plasma',
+                      '14' = 'Progenitor',
+                      '15' = 'Mast'
+)
+
+names(cell.subtype.ids) <- levels(Human)
+Human <- RenameIdents(Human, cell.subtype.ids)
+Human$cell.subtype <- Idents(Human)
+
+DimPlot(Human, label = TRUE, label.size = 6, pt.size = 0.5, repel = T) + NoLegend()
+
+arr2 <- list(x = -17, y = -20, x_len = 5, y_len = 6)
+p2 <- DimPlot(Human, reduction = "umap", label = TRUE, label.size = 6, repel = TRUE) +
+  NoLegend() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 10, hjust = 0.07, size = 10),
+        axis.title.y = element_text(vjust = -11, hjust = 0.06, size = 10)) +
+  annotate("segment", 
+           x = arr2$x, xend = arr2$x + c(arr2$x_len, 0), 
+           y = arr2$y, yend = arr2$y + c(0, arr2$y_len), 
+           arrow = arrow(type = "closed", length = unit(6, 'pt')))
+p2
+
+# Figure C ----
+
+# Mouse
+breakdown <- table(Endo_Intact@active.ident)
+Cluster <- names(breakdown)
+breakdown <- round(as.vector(breakdown) / sum(breakdown) * 100, 1)
+
+mouse_intact_pf_df <- data.frame(Cluster = Cluster, Proportion = breakdown, Type = 'Mouse') %>% 
+  dplyr::mutate(Grouped = case_when(Cluster %in% c('LpM3','Mono-derived \n LpM2', 'Mono-derived \n LpM1','SpM', 'Prolif LpM') ~ 'Macrophages',
+                                    Cluster %in% c('DC') ~ 'DCs',
+                                    Cluster %in% c('NK') ~ 'NKs',
+                                    Cluster %in% c('T') ~ 'T cells',
+                                    Cluster %in% c('B1', 'B2') ~ 'B cells',
+                                    !Cluster %in% c('LpM3','Mono-derived \n LpM2', 'Mono-derived \n LpM1','SpM', 'Prolif LpM', 'DC', 'NK', 'T', 'B1', 'B2') ~ 'Other')) %>%
+  group_by(Grouped) %>% dplyr::mutate(Grouped_Prop = sum(Proportion)) %>% dplyr::mutate(Grouped = factor(Grouped, levels = c('Macrophages','DCs', 'B cells', 'T cells', 'NKs', 'Other')))
+
+ggplot(mouse_intact_pf_df, aes(fill=Grouped, y=Proportion, x=Type)) + 
+  geom_bar(position="fill", stat="identity")  + theme(legend.position = "right", legend.title = element_blank(), text = element_text(size=12), axis.text = element_text(size=12),
+                                                      axis.text.x = element_text(angle = 0, 
+                                                                                 vjust = 0.5, 
+                                                                                 hjust = 0.5))
+
+# Human
+
+# Separate Prolif Macs from prolif T
+
+# Get cell Ids of Proliferating macrophages (exclude proliferating T cells from cluster)
+Prolif_cluster <- subset(Human, idents = "Prolif-pM") # subset UMAP for prolif cluster
+
+# Check Plot
+plot2 <- DimPlot(Prolif_cluster, reduction = "umap", label = TRUE) + NoLegend()
+plot2
+# Select for proliferating T cells
+Prolif_T_IDs <- CellSelector(plot2) # select proliferating macrophages (exclude prolierating T cells)
+
+# Make prolif macophages part of 'Macrophage' identity
+
+## Method
+Idents(Human, cells = Prolif_T_IDs, drop = FALSE, replace = FALSE) <- "Prolif-T"
+DimPlot(Human, reduction = "umap", label = TRUE, label.size = 6, pt.size = 0.5, repel = T) + NoLegend()
+
+breakdown <- table(Human@active.ident)
+Cluster <- names(breakdown)
+breakdown <- round(as.vector(breakdown) / sum(breakdown) * 100, 1)
+
+human_pf_df <- data.frame(Cluster = Cluster, Proportion = breakdown, Type = 'Human') %>%
+  dplyr::mutate(Grouped = case_when(Cluster %in% c('pM1','pM2','pM3','pM4', 'pMono', 'Prolif-pM') ~ 'Macrophages',
+                                    Cluster %in% c('DC1','DC2') ~ 'DCs',
+                                    Cluster %in% c('NK1','NK2') ~ 'NKs',
+                                    Cluster %in% c('T1', 'T2', 'Prolif-T') ~ 'T cells',
+                                    !Cluster %in% c('pM1','pM2','pM3','pM4', 'pMono', 'Prolif-pM','DC1','DC2','NK1','NK2', 'T1', 'T2') ~ 'Other')) %>%
+  group_by(Grouped) %>% dplyr::mutate(Grouped_Prop = sum(Proportion)) %>% dplyr::mutate(Grouped = factor(Grouped, levels = c('Macrophages','DCs','T cells', 'NKs','Other')))
+
+ggplot(human_pf_df, aes(fill=Grouped, y=Proportion, x=Type)) + 
+  geom_bar(position="fill", stat="identity")  + theme(legend.position = "right", legend.title = element_blank(), text = element_text(size=12), axis.text = element_text(size=12),
+                                                      axis.text.x = element_text(angle = 0, 
+                                                                                 vjust = 0.5, 
+                                                                                 hjust = 0.5))
+# Plot together
+
+combined <- rbind(mouse_intact_pf_df, human_pf_df)
+
+p3 <- ggplot(combined, aes(fill=Grouped, y=Proportion, x=Type)) + xlab('Species') +
+  geom_bar(position="fill", stat="identity") +
+  theme(legend.position = "right",
+        legend.key.size = unit(0.8, 'cm'),
+        legend.text = element_text(size = 15),
+        legend.title = element_blank(),
+        text = element_text(size=12),
+        axis.text = element_text(size=12),
+        axis.text.x = element_text(angle = 0, vjust = 0.5, hjust = 0.5)) + 
+  scale_x_discrete(limits = rev)
+
+p3
+
+# Figure D ----
+
+UMAP_Mm_Highlighted_Macs <- readRDS("UMAP_Mouse_Macrophages_highlighted.rds")
+UMAP_Hs_Highlighted_Macs <- readRDS("UMAP_Human_Macrophages_highlighted.rds")
+x.up <- readRDS("Upregulated.lists.rds")
+x.down <- readRDS("Downregulated.lists.rds")
+
+
+UMAP_Mm_Highlighted_Macs <- UMAP_Mm_Highlighted_Macs +
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+
+UMAP_Hs_Highlighted_Macs <- UMAP_Hs_Highlighted_Macs +
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank())
+
+venn.up <- ggvenn(x.up, fill_color = c("#C6CDF7","#E6A0C4"), show_percentage = FALSE, set_name_size = 0, text_size = 5) 
+venn.up <- venn.up +
+  ggtitle("Up-regulated") +
+  theme(plot.title = element_text(size = 15, hjust = 0.5, vjust = -3))
+
+venn.up
+
+
+venn.down <- ggvenn(x.down, fill_color = c("#C6CDF7","#E6A0C4"), show_percentage = FALSE, set_name_size = 0, text_size = 5) 
+venn.down <- venn.down +
+  ggtitle("Down-regulated") +
+  theme(plot.title = element_text(size = 15, hjust = 0.5, vjust = -3))
+
+p4 <- plot_grid(UMAP_Mm_Highlighted_Macs, UMAP_Hs_Highlighted_Macs, venn.up, venn.down, ncol = 2)
+
+p4
+
+# Figure E ----
+# Merged UMAP
+
+merged_pf_obj <- readRDS("merged_pf_obj_2024-06-06.rds")
+DimPlot(merged_pf_obj, reduction = "umap.cca", label = TRUE)
+
+arr3 <- list(x = -5, y = -7, x_len = 2, y_len = 3)
+p5 <- DimPlot(merged_pf_obj, reduction = "umap.cca", label = FALSE, label.size = 6, repel = FALSE) +
+  NoLegend() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 10, hjust = 0.07, size = 10),
+        axis.title.y = element_text(vjust = -10, hjust = 0.08, size = 10)) +
+  annotate("segment", 
+           x = arr3$x, xend = arr3$x + c(arr3$x_len, 0), 
+           y = arr3$y, yend = arr3$y + c(0, arr3$y_len), 
+           arrow = arrow(type = "closed", length = unit(6, 'pt')))
+p5
+
+# Figure F ----
+# Plot species breakdown
+
+breakdown <- table(merged_pf_obj@active.ident, merged_pf_obj@meta.data$Species)
+sums_norm <- apply(breakdown,2,sum)
+scaled_breakdown <- sweep(breakdown,2,sums_norm,'/')
+sums <- apply(scaled_breakdown,1,sum) 
+percent_breakdown <- sweep(scaled_breakdown,1,sums,'/') * 100
+
+gg_df <- as.data.frame(percent_breakdown)
+colnames(gg_df) <- c('Cluster','Sample','Proportion') 
+p6 <- ggplot(gg_df, aes(fill=Sample, y=Proportion, x=Cluster)) + coord_flip()  + 
+  geom_bar(position="fill", stat="identity") + 
+  theme(legend.position = "right",
+        legend.title = element_blank(),
+        legend.key.size = unit(0.8, 'cm'),
+        legend.text = element_text(size = 15),
+        text = element_text(size=10),
+        axis.title.y = element_blank(),
+        axis.title.x = element_text(size = 15),
+        axis.text = element_text(size=15),
+        axis.text.x = element_text(angle = 45, 
+                                   vjust = 1, 
+                                   hjust = 1)) +
+  scale_fill_manual(values = wes_palette("GrandBudapest2", n = 2))
+
+p6
+
+# Complete Figure ----
+
+row1 <- plot_grid(p1, p2, nrow = 1, labels = "AUTO", label_size = 17)
+row2 <- plot_grid(p3, p4, nrow = 1, labels = c("C", "D"), rel_widths = c(1, 1.3), label_size = 17)
+row3 <- plot_grid(p5, p6, nrow = 1, labels = c("E", "F"), rel_widths = c(1, 1.3), label_size = 17)
+
+figure_S9 <- plot_grid(row1, row2, row3, ncol = 1)
