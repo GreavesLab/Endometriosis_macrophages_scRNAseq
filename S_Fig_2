@@ -1,1 +1,113 @@
 Figure S2: Transcriptomic heterogeneity of peritoneal macrophages in an ovariectomised model of induced endometriosis. 
+
+# Load Libraries ----
+library(Seurat)
+library(dplyr)
+library(Matrix)
+library(ggplot2)
+library(cowplot)
+
+# Load Seuart object ----
+OVX <- readRDS("/OVX&ShamPF.rds")
+
+# Supplementary Figure S2A ----
+# Endo-OVX and Sham PF UMAP
+
+# OVX UMAP coloured by cluster
+arr <- list(x = -13.6, y = -17, x_len = 6.5, y_len = 6.5) # placement of UMAP axis arrows
+
+FS2A.1 <- DimPlot(OVX, reduction = "umap", label = TRUE, group.by = "celltype") +
+  NoLegend() +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(plot.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 12, hjust = 0.1, size = 10),
+        axis.title.y = element_text(vjust = -11.5, hjust = 0.08, size = 10)) +
+  annotate("segment", 
+           x = arr$x, xend = arr$x + c(arr$x_len, 0), 
+           y = arr$y, yend = arr$y + c(0, arr$y_len), 
+           arrow = arrow(type = "closed", length = unit(10, 'pt')))
+FS2A.1
+
+# Intact UMAP coloured by species (inset)
+arr <- list(x = -13.6, y = -17, x_len = 6.5, y_len = 6.5) # placement of UMAP axis arrows
+
+FS2A.2 <- DimPlot(OVX, reduction = "umap", label = FALSE, group.by = "orig.ident") +
+  xlab("UMAP 1") + ylab("UMAP 2") +
+  theme(plot.title = element_blank(),
+        axis.line = element_blank(),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title.x = element_text(vjust = 12, hjust = 0.1, size = 10),
+        axis.title.y = element_text(vjust = -11.5, hjust = 0.08, size = 10)) +
+  annotate("segment", 
+           x = arr$x, xend = arr$x + c(arr$x_len, 0), 
+           y = arr$y, yend = arr$y + c(0, arr$y_len), 
+           arrow = arrow(type = "closed", length = unit(10, 'pt')))
+
+FS2A.2
+
+# Supplementary Figure S2B----
+# Barchart of cluster membership from different samples
+
+breakdown <- table(OVX@meta.data$celltype2, OVX@meta.data$orig.ident)
+breakdown
+
+## Normalise
+sums_norm <- apply(breakdown,2,sum)
+scaled_breakdown <- sweep(breakdown,2,sums_norm,'/')
+sums <- apply(scaled_breakdown,1,sum)
+percent_breakdown <- sweep(scaled_breakdown,1,sums,'/') * 100
+percent_breakdown
+
+gg_df <- as.data.frame(percent_breakdown)
+colnames(gg_df) <- c('Cluster','Sample','Proportion')
+
+ggplot(gg_df, aes(fill=Sample, y=Proportion, x=Cluster)) +
+  geom_bar(position="fill", stat="identity") + coord_flip()
+
+FS2B <- ggplot(gg_df, aes(x=Cluster, y=Proportion, fill=Sample)) + 
+  geom_bar(position = "fill", stat="identity") +
+  #scale_x_discrete(limits = cluster) +
+  coord_flip() +
+  theme_minimal() +
+  theme(plot.title = element_text(size = 14, face = "plain", hjust = 0.5),
+        legend.position = "top", legend.title = element_blank(), legend.text = element_text(size = 10),
+        axis.title = element_blank(),
+        axis.text = element_text(vjust = 0.5, size = 10)) + 
+  scale_fill_discrete(labels=c("Endo-OVX PF", "Sham PF")) +
+  guides(fill = guide_legend(reverse=TRUE)) +
+  scale_y_continuous(labels = scales::percent)
+
+FS2B
+
+
+
+# Supplementary Figure S2C ----
+# Heatmap displaying top 5 genes per cluster
+
+OVX_markers <- FindAllMarkers(object = OVX, only.pos = TRUE, min.pct = 0.25, logfc.threshold = 0.25)
+
+OVX_markers %>% group_by(cluster) %>% top_n(n = 5, wt = avg_log2FC) -> top5
+FS2C <- DoHeatmap(object = OVX, features = top5$gene, size = 5, angle = 0, hjust = 0.5, group.by = "celltype") +
+  theme(axis.text.y = element_text(size = 8)) + NoLegend()
+
+FS2C
+
+
+# Supplementary Figure S2D ----
+# Feature Plots
+
+genes_used <- c("Ccr2, Timd4")
+
+FS2D <- FeaturePlot(Intact, features = genes_used, cols = c("grey", "orange", "red"), label = TRUE, label.size = 3, repel = T) + 
+  labs(x = "UMAP 1", y = "UMAP 2") &
+  theme(plot.title = element_text(face = "italic"),
+        axis.line = element_line(size = 0.7),
+        axis.ticks = element_blank(),
+        axis.text = element_blank(),
+        axis.title = element_blank()) + NoLegend()
+
+FS2D
